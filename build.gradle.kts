@@ -1,14 +1,8 @@
-val ktor_version: String by project
-val kotlin_version: String by project
-val logback_version: String by project
-val exposed_version: String by project
-val h2_version: String by project
-
 plugins {
     application
-    kotlin("jvm") version "1.9.0"
-    id("io.ktor.plugin") version "2.3.2"
-    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
+    kotlin("jvm") version libs.versions.kotlin.version
+    libs.plugins.ktor
+    libs.plugins.kotlinx.serialization
 }
 
 group = "com.bpavuk"
@@ -22,6 +16,10 @@ application {
 
 repositories {
     mavenCentral()
+}
+
+kotlin {
+    jvmToolchain(8)
 }
 
 dependencies {

@@ -30,3 +30,9 @@ exposed-jdbc = { group = "org.jetbrains.exposed", version.ref = "exposed_version
 
 # h2
 h2 = { group = "com.h2database", version.ref = "h2_version", name = "h2" }
+
+[plugins]
+
+ktor = { id = "io.ktor.plugin", version.ref = "ktor_version" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin_version" }
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin_version" }
