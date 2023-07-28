@@ -3,9 +3,14 @@ package com.bpavuk.wsSeabattle.battle.endpoints
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import java.util.Collections
+import java.util.concurrent.atomic.AtomicInteger
 
 fun Route.battleRouting() {
+    val connections = Collections.synchronizedSet<Connection>(LinkedHashSet())
     webSocket("/battle/session") {
+        val thisConnection = Connection(this)
+        connections.add(thisConnection)
         for (frame in incoming) {
             if (frame is Frame.Text) {
 //                val text = frame.readText()
@@ -16,6 +21,8 @@ fun Route.battleRouting() {
                 when (val message = frame.readText()) {
                     ":q" -> {
                         close(CloseReason(CloseReason.Codes.NORMAL, "Player gone"))
+                        connections.remove(thisConnection)
+                        connections.forEach { it.session.send(Frame.Text("${thisConnection.name} gone fuck")) }
                     }
                     else -> {
                         val coordinate = message.toCoordinate()
@@ -23,7 +30,10 @@ fun Route.battleRouting() {
                             outgoing.send(Frame.Text("Invalid coordinate"))
                         } else {
                             table[coordinate.x][coordinate.y] = 1
-                            outgoing.send(Frame.Text(table.prettify()))
+                            connections.forEach {
+                                it.session.send(Frame.Text("[${thisConnection.name}]: $coordinate"))
+                                it.session.send(Frame.Text(table.prettify()))
+                            }
                         }
                     }
                 }
@@ -68,4 +78,12 @@ fun String.toCoordinate(): Coordinate? {
         }
     }
     return Coordinate(coordinateList[0], coordinateList[1])
+}
+
+class Connection(val session: DefaultWebSocketSession) {
+
+    companion object {
+        val lastId = AtomicInteger(0)
+    }
+    val name = "user${lastId.getAndIncrement()}"
 }
