@@ -5,8 +5,6 @@ plugins {
     libs.plugins.kotlinx.serialization
 }
 
-group = "com.bpavuk"
-version = "0.0.1"
 application {
     mainClass.set("io.ktor.server.cio.EngineMain")
 
@@ -23,6 +21,8 @@ kotlin {
 }
 
 dependencies {
+    implementation(projects.feature)
+
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.openapi)
     implementation(libs.ktor.server.contentNegotiation)

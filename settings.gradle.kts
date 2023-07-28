@@ -21,3 +21,11 @@ dependencyResolutionManagement {
 }
 
 includeBuild("build-logic")
+
+
+include("application")
+include("core")
+include("core:database")
+include("feature")
+include("feature:battle")
+include("feature:battle:endpoints")
