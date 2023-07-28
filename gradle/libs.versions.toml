@@ -1,0 +1,32 @@
+[versions]
+
+ktor_version = "2.3.2"
+kotlin_version = "1.9.0"
+logback_version = "1.2.11"
+exposed_version = "0.41.1"
+h2_version = "2.1.214"
+
+[libraries]
+
+# koltin
+kotlinJunit = { group = "org.jetbrains.kotlin", version.ref = "kotlin_version", name = "kotlin-test-junit" }
+
+# ktor
+ktor-server-core = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-core" }
+ktor-server-openapi = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-openapi" }
+ktor-server-contentNegotiation = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-content-negotiation" }
+ktor-server-serialization-json = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-serialization-kotlinx-json" }
+ktor-server-websockets = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-websockets" }
+ktor-server-auth = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-auth" }
+ktor-server-cio = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-cio" }
+ktor-server-tests = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-tests" }
+
+# logback
+logback-classic = { group = "ch.qos.logback", version.ref = "logback_version", name = "logback-classic" }
+
+# exposed
+exposed-core = { group = "org.jetbrains.exposed", version.ref = "exposed_version", name = "exposed-core" }
+exposed-jdbc = { group = "org.jetbrains.exposed", version.ref = "exposed_version", name = "exposed-jdbc" }
+
+# h2
+h2 = { group = "com.h2database", version.ref = "h2_version", name = "h2" }
