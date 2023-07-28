@@ -1,13 +1,9 @@
 plugins {
-    kotlin("jvm") version libs.versions.kotlin.version
+    id("backend-convention")
 }
 
 repositories {
     mavenCentral()
-}
-
-kotlin {
-    jvmToolchain(8)
 }
 
 dependencies {

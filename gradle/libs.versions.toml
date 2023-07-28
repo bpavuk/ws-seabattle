@@ -10,10 +10,11 @@ h2_version = "2.1.214"
 
 # koltin
 kotlinJunit = { group = "org.jetbrains.kotlin", version.ref = "kotlin_version", name = "kotlin-test-junit" }
+kotlin-plugin = { group = "org.jetbrains.kotlin", version.ref = "kotlin_version", name = "kotlin-gradle-plugin" }
 
 # ktor
 ktor-server-core = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-core" }
-ktor-server-openapi = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-openapi" }
+ktor-server-openapi = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-swagger" }
 ktor-server-contentNegotiation = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-content-negotiation" }
 ktor-server-serialization-json = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-serialization-kotlinx-json" }
 ktor-server-websockets = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-websockets" }

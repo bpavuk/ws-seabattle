@@ -1,8 +1,0 @@
-openapi: "3.0.3"
-info:
-  title: "ws_seabattle API"
-  description: "ws_seabattle API"
-  version: "1.0.0"
-servers:
-- url: "https://ws_seabattle"
-paths: {}

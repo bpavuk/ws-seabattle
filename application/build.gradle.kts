@@ -1,6 +1,6 @@
 plugins {
     application
-    kotlin("jvm") version libs.versions.kotlin.version
+    id("backend-convention")
     libs.plugins.ktor
     libs.plugins.kotlinx.serialization
 }
@@ -14,10 +14,6 @@ application {
 
 repositories {
     mavenCentral()
-}
-
-kotlin {
-    jvmToolchain(8)
 }
 
 dependencies {

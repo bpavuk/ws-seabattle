@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version libs.versions.kotlin.version
+    id("backend-convention")
 }
 
 dependencies {

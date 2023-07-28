@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version libs.versions.kotlin.version
+    id("backend-convention")
 }
 
 repositories {
@@ -8,8 +8,4 @@ repositories {
 
 dependencies {
     api(projects.feature.battle.endpoints)
-}
-
-kotlin {
-    jvmToolchain(8)
 }
