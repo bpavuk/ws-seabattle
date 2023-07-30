@@ -36,3 +36,11 @@ include("feature:battle:database")
 include("feature:battle:database:integration")
 include("core:types")
 findProject(":core:types")?.name = "types"
+include("feature:chat")
+findProject(":feature:chat")?.name = "chat"
+include("feature:chat:endpoints")
+findProject(":feature:chat:endpoints")?.name = "endpoints"
+include("feature:chat:usecase")
+findProject(":feature:chat:usecase")?.name = "usecase"
+include("feature:chat:usecase:integration")
+findProject(":feature:chat:usecase:integration")?.name = "integration"

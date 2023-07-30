@@ -6,16 +6,17 @@ import com.bpavuk.wsSeabattle.battle.endpoints.get.GetRoomRepository
 import com.bpavuk.wsSeabattle.battle.endpoints.get.GetRoomResponse
 import com.bpavuk.wsSeabattle.battle.endpoints.join.JoinRoomRepository
 import com.bpavuk.wsSeabattle.battle.endpoints.join.JoinRoomResult
+import com.bpavuk.wsSeabattle.chat.endpoints.ChatRepository
+import com.bpavuk.wsSeabattle.chat.endpoints.ChatResponse
 import com.bpavuk.wsSeabattle.core.endpoints.ConnectionContainer
 import com.bpavuk.wsSeabattle.core.endpoints.removeInactiveConnections
 import com.bpavuk.wsSeabattle.core.types.Connection
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import java.util.*
 
 fun Route.battleRouting(dependencies: BattleDependencies) {
-    val container = ConnectionContainer()
+    val container = dependencies.connectionContainer
     webSocket("/battle/session") {
         val thisConnection = Connection(this)
         container.connections.add(thisConnection)
@@ -55,8 +56,17 @@ fun Route.battleRouting(dependencies: BattleDependencies) {
                         when (
                             dependencies.joinRoomRepository.join(roomId, thisConnection.userId)
                         ) {
-                            JoinRoomResult.RoomNotFound -> thisConnection.session.send("room with id $roomId not found")
-                            JoinRoomResult.Success -> thisConnection.session.send("joined to room $roomId")
+                            JoinRoomResult.RoomNotFound ->
+                                thisConnection.session.send("room with id $roomId not found")
+                            JoinRoomResult.Success ->
+                                thisConnection.session.send("joined to room $roomId")
+                        }
+                    }
+                    else -> {
+                        when (dependencies.chatRepository.sendTheMessage(thisConnection.userId, message)) {
+                            ChatResponse.MessageSent -> {}
+                            ChatResponse.NotJoinedToAnyRoom ->
+                                thisConnection.session.send("you are not joined to any room")
                         }
                     }
                 }
@@ -68,5 +78,7 @@ fun Route.battleRouting(dependencies: BattleDependencies) {
 class BattleDependencies(
     val createRoomRepository: CreateRoomRepository,
     val getRoomRepository: GetRoomRepository,
-    val joinRoomRepository: JoinRoomRepository
+    val joinRoomRepository: JoinRoomRepository,
+    val chatRepository: ChatRepository,
+    val connectionContainer: ConnectionContainer
 )

@@ -7,6 +7,5 @@ repositories {
 }
 
 dependencies {
-    api(projects.feature.battle)
-    api(projects.feature.chat)
+
 }

@@ -7,11 +7,9 @@ repositories {
 }
 
 dependencies {
-    api(projects.core.types)
+    api(projects.feature.battle.usecase)
     api(projects.core.endpoints)
 
-    api(projects.feature.chat.endpoints)
-
-    implementation(libs.ktor.server.core)
+    api(libs.kotlinx.coroutines.core)
     implementation(libs.ktor.server.websockets)
 }

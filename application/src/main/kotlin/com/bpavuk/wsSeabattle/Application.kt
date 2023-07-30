@@ -11,6 +11,9 @@ import com.bpavuk.wsSeabattle.battle.usecase.JoinRoomUsecase
 import com.bpavuk.wsSeabattle.battle.usecase.integration.UsecaseCreateRoomRepository
 import com.bpavuk.wsSeabattle.battle.usecase.integration.UsecaseGetRoomRepository
 import com.bpavuk.wsSeabattle.battle.usecase.integration.UsecaseJoinRoomRepository
+import com.bpavuk.wsSeabattle.chat.usecase.ChatUsecase
+import com.bpavuk.wsSeabattle.chat.usecase.integration.UsecaseChatRepository
+import com.bpavuk.wsSeabattle.core.endpoints.ConnectionContainer
 import com.bpavuk.wsSeabattle.plugins.configureOpenAPI
 import com.bpavuk.wsSeabattle.plugins.configureSerialization
 import com.bpavuk.wsSeabattle.plugins.configureSockets
@@ -26,6 +29,12 @@ fun Application.module() {
     configureSerialization()
     configureSockets()
 
+    val getRoomUsecase = GetRoomUsecase(
+        storage = DatabaseGetRoomStorage()
+    )
+
+    val connectionContainer = ConnectionContainer()
+
     routing {
         battleRouting(
             BattleDependencies(
@@ -35,16 +44,21 @@ fun Application.module() {
                     )
                 ),
                 getRoomRepository = UsecaseGetRoomRepository(
-                    usecase = GetRoomUsecase(
-                        storage = DatabaseGetRoomStorage()
-                    )
+                    usecase = getRoomUsecase
                 ),
                 joinRoomRepository = UsecaseJoinRoomRepository(
                     usecase = JoinRoomUsecase(
                         storage = DatabaseJoinRoomStorage()
                     )
-                )
-            )
+                ),
+                chatRepository = UsecaseChatRepository(
+                    usecase = ChatUsecase(
+                        getRoomUsecase = getRoomUsecase,
+                        connectionContainer = connectionContainer
+                    )
+                ),
+                connectionContainer = connectionContainer
+            ),
         )
     }
 }

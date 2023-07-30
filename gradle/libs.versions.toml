@@ -5,12 +5,17 @@ kotlin_version = "1.9.0"
 logback_version = "1.2.11"
 exposed_version = "0.41.1"
 h2_version = "2.1.214"
+coroutines_version = "1.7.3"
 
 [libraries]
 
 # koltin
 kotlinJunit = { group = "org.jetbrains.kotlin", version.ref = "kotlin_version", name = "kotlin-test-junit" }
 kotlin-plugin = { group = "org.jetbrains.kotlin", version.ref = "kotlin_version", name = "kotlin-gradle-plugin" }
+
+# coroutines
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", version.ref = "coroutines_version", name = "kotlinx-coroutines-core" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", version.ref = "coroutines_version", name = "kotlinx-coroutines-test" }
 
 # ktor
 ktor-server-core = { group = "io.ktor", version.ref = "ktor_version", name = "ktor-server-core" }
