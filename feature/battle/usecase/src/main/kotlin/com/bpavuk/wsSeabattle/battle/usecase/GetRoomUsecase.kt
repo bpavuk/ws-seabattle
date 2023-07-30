@@ -1,6 +1,7 @@
 package com.bpavuk.wsSeabattle.battle.usecase
 
-import com.bpavuk.wsSeabattle.battle.types.Room
+import com.bpavuk.wsSeabattle.core.types.Room
+
 
 class GetRoomUsecase(
     private val storage: Storage

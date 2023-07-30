@@ -1,4 +1,4 @@
-package com.bpavuk.wsSeabattle.battle.types
+package com.bpavuk.wsSeabattle.core.types
 
 data class Coordinate(val x: Int, val y: Int)
 

@@ -6,33 +6,24 @@ import com.bpavuk.wsSeabattle.battle.endpoints.get.GetRoomRepository
 import com.bpavuk.wsSeabattle.battle.endpoints.get.GetRoomResponse
 import com.bpavuk.wsSeabattle.battle.endpoints.join.JoinRoomRepository
 import com.bpavuk.wsSeabattle.battle.endpoints.join.JoinRoomResult
-import com.bpavuk.wsSeabattle.battle.types.Connection
+import com.bpavuk.wsSeabattle.core.endpoints.ConnectionContainer
+import com.bpavuk.wsSeabattle.core.endpoints.removeInactiveConnections
+import com.bpavuk.wsSeabattle.core.types.Connection
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import kotlinx.coroutines.isActive
 import java.util.*
 
 fun Route.battleRouting(dependencies: BattleDependencies) {
-    val connections = Collections.synchronizedSet<Connection>(LinkedHashSet())
-    val connectionsToRemove = Collections.synchronizedSet<Connection>(LinkedHashSet())
+    val container = ConnectionContainer()
     webSocket("/battle/session") {
         val thisConnection = Connection(this)
-        connections.add(thisConnection)
-        thisConnection.session.send(":q for quit, /new for room creation")
+        container.connections.add(thisConnection)
+        thisConnection.session.send(":q for quit, /new for room creation, /join <room id> for joining, " +
+                "/whereami for current room")
         for (frame in incoming) {
             if (frame is Frame.Text) {
-                connections.forEach { connection ->
-                    if (!connection.session.isActive) {
-                        connection.session.close(CloseReason(
-                            CloseReason.Codes.GOING_AWAY,
-                            "${connection.name} gone"
-                        ))
-                        connectionsToRemove.add(connection)
-                    }
-                }
-                connections.removeAll(connectionsToRemove)
-                connectionsToRemove.clear()
+                container.removeInactiveConnections()
 
                 val message = frame.readText()
 
@@ -40,7 +31,7 @@ fun Route.battleRouting(dependencies: BattleDependencies) {
                     message == ":q" -> {
                         thisConnection.session.send("bye")
                         thisConnection.session.close()
-                        connections.remove(thisConnection)
+                        container.connections.remove(thisConnection)
                     }
                     message == "/new" -> {
                         when (val response = dependencies.createRoomRepository.createRoom(thisConnection.userId)) {

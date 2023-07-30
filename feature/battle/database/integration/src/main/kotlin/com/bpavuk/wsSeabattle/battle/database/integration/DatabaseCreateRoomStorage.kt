@@ -1,8 +1,8 @@
 package com.bpavuk.wsSeabattle.battle.database.integration
 
-import RoomsDao
-import com.bpavuk.wsSeabattle.battle.types.Room
+import com.bpavuk.wsSeabattle.battle.database.RoomsDao
 import com.bpavuk.wsSeabattle.battle.usecase.CreateRoomUsecase
+import com.bpavuk.wsSeabattle.core.types.Room
 
 
 class DatabaseCreateRoomStorage: CreateRoomUsecase.Storage {

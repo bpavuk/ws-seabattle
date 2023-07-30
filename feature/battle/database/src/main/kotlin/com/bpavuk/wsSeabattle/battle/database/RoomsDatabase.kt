@@ -1,4 +1,7 @@
-import com.bpavuk.wsSeabattle.battle.types.Room
+package com.bpavuk.wsSeabattle.battle.database
+
+import com.bpavuk.wsSeabattle.core.types.Room
+
 
 /**
  * A singleton class that represents a database of rooms.

@@ -1,4 +1,4 @@
-package com.bpavuk.wsSeabattle.battle.types
+package com.bpavuk.wsSeabattle.core.types
 
 import io.ktor.websocket.*
 import java.util.concurrent.atomic.AtomicInteger

@@ -34,3 +34,5 @@ include("feature:battle:usecase:integration")
 include("core:endpoints")
 include("feature:battle:database")
 include("feature:battle:database:integration")
+include("core:types")
+findProject(":core:types")?.name = "types"

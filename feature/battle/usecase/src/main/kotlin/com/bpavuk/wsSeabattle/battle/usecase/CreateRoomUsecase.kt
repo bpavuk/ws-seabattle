@@ -1,7 +1,7 @@
 package com.bpavuk.wsSeabattle.battle.usecase
 
-import com.bpavuk.wsSeabattle.battle.types.Room
 import com.bpavuk.wsSeabattle.battle.usecase.CreateRoomUsecase.Storage
+import com.bpavuk.wsSeabattle.core.types.Room
 
 /**
  * The CreateRoomUsecase class is responsible for creating a room for a given user ID and joining the user to the room.

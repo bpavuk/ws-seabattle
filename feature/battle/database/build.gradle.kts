@@ -7,7 +7,7 @@ repositories {
 }
 
 dependencies {
-    api(projects.feature.battle.types)
+    api(projects.core.types)
 
     api(libs.exposed.core)
     api(libs.exposed.jdbc)
