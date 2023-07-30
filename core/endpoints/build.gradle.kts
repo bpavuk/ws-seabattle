@@ -5,7 +5,3 @@ plugins {
 repositories {
     mavenCentral()
 }
-
-dependencies {
-    api(projects.feature.battle.types)
-}

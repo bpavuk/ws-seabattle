@@ -7,6 +7,8 @@ repositories {
 }
 
 dependencies {
+    api(projects.feature.battle.types)
+
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.websockets)
 }

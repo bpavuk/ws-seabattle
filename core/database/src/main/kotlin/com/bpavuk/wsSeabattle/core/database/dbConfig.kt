@@ -1,4 +1,4 @@
-package com.bpavuk.wsSeabattle
+package com.bpavuk.wsSeabattle.core.database
 
 import org.jetbrains.exposed.sql.Database
 

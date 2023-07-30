@@ -1,7 +1,19 @@
 package com.bpavuk.wsSeabattle
 
+import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseCreateRoomStorage
+import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseGetRoomStorage
+import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseJoinRoomStorage
+import com.bpavuk.wsSeabattle.battle.endpoints.BattleDependencies
 import com.bpavuk.wsSeabattle.battle.endpoints.battleRouting
-import com.bpavuk.wsSeabattle.plugins.*
+import com.bpavuk.wsSeabattle.battle.usecase.CreateRoomUsecase
+import com.bpavuk.wsSeabattle.battle.usecase.GetRoomUsecase
+import com.bpavuk.wsSeabattle.battle.usecase.JoinRoomUsecase
+import com.bpavuk.wsSeabattle.battle.usecase.integration.UsecaseCreateRoomRepository
+import com.bpavuk.wsSeabattle.battle.usecase.integration.UsecaseGetRoomRepository
+import com.bpavuk.wsSeabattle.battle.usecase.integration.UsecaseJoinRoomRepository
+import com.bpavuk.wsSeabattle.plugins.configureOpenAPI
+import com.bpavuk.wsSeabattle.plugins.configureSerialization
+import com.bpavuk.wsSeabattle.plugins.configureSockets
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 
@@ -15,6 +27,24 @@ fun Application.module() {
     configureSockets()
 
     routing {
-        battleRouting()
+        battleRouting(
+            BattleDependencies(
+                createRoomRepository = UsecaseCreateRoomRepository(
+                    usecase = CreateRoomUsecase(
+                        storage = DatabaseCreateRoomStorage()
+                    )
+                ),
+                getRoomRepository = UsecaseGetRoomRepository(
+                    usecase = GetRoomUsecase(
+                        storage = DatabaseGetRoomStorage()
+                    )
+                ),
+                joinRoomRepository = UsecaseJoinRoomRepository(
+                    usecase = JoinRoomUsecase(
+                        storage = DatabaseJoinRoomStorage()
+                    )
+                )
+            )
+        )
     }
 }

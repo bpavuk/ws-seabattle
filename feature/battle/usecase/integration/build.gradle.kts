@@ -7,5 +7,6 @@ repositories {
 }
 
 dependencies {
-    api(projects.feature.battle.types)
+    api(projects.feature.battle.usecase)
+    api(projects.feature.battle.endpoints)
 }
