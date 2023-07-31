@@ -1,8 +1,7 @@
 package com.bpavuk.wsSeabattle.battle.endpoints.join
 
-import com.bpavuk.wsSeabattle.core.endpoints.ConnectionContainer
 import com.bpavuk.wsSeabattle.core.endpoints.Plugin
-import com.bpavuk.wsSeabattle.core.types.Connection
+import com.bpavuk.wsSeabattle.core.endpoints.createBackendPlugin
 import io.ktor.websocket.*
 
 interface JoinRoomRepository {
@@ -17,13 +16,12 @@ sealed interface JoinRoomResult {
     data object AlreadyInRoom: JoinRoomResult
 }
 
-class JoinRoomPlugin(
-    private val joinRoomRepository: JoinRoomRepository,
-    allUsers: ConnectionContainer
-): Plugin(allUsers) {
-    override suspend fun onMessage(message: Frame, thisUser: Connection): Boolean {
-        println("join room is called")
-        return if (message is Frame.Text && message.readText().matches("/join ?\\d+?".toRegex())) {
+@Suppress("FunctionName")
+fun JoinRoomPlugin(
+    joinRoomRepository: JoinRoomRepository
+): Plugin = createBackendPlugin {
+    onMessage = { message, thisUser ->
+        if (message is Frame.Text && message.readText().matches("/join ?\\d+?".toRegex())) {
             val numberFinderRegex = Regex("\\d+")
             val roomId = numberFinderRegex.find(message.readText())!!.value.toInt()
             when (

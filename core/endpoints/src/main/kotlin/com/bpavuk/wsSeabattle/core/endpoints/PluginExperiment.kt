@@ -1,33 +1,15 @@
 package com.bpavuk.wsSeabattle.core.endpoints
 
-import com.bpavuk.wsSeabattle.core.types.Connection
+import com.bpavuk.wsSeabattle.core.types.UserConnection
 import io.ktor.websocket.*
 
-abstract class Plugin(
-    val allUsers: ConnectionContainer
+class Plugin(
+    private val messageHandler: suspend (Frame, UserConnection) -> Boolean
 ) {
-    suspend fun Connection.send(message: String) {
-        session.send(message)
-    }
-
-    suspend fun Connection.send(message: Frame) {
-        session.send(message)
-    }
-
-    suspend fun Connection.send(message: ByteArray) {
-        session.send(message)
-    }
-
-    /**
-     * Handles incoming messages.
-     *
-     * @param message The message to be processed.
-     * @return Boolean value indicating whether the message was processed.
-     */
-    abstract suspend fun onMessage(message: Frame, thisUser: Connection): Boolean
+    suspend fun onMessage(message: Frame, thisUser: UserConnection): Boolean = messageHandler(message, thisUser)
 }
 
-class PluginRegistry {
+object PluginRegistry {
     val plugins = mutableListOf<Plugin>()
 
     fun install(plugin: Plugin) {
@@ -37,4 +19,48 @@ class PluginRegistry {
 
 fun expandableScope(registry: PluginRegistry, block: PluginRegistry.() -> Unit) {
     block(registry)
+}
+
+fun createBackendPlugin(
+    config: PluginApi.() -> Unit
+): Plugin {
+    val api = PluginApi()
+    api.config()
+    return Plugin(api.onMessage)
+}
+
+@Suppress("MemberVisibilityCanBePrivate", "unused")
+class PluginApi(
+    var onMessage: suspend (Frame, UserConnection) -> Boolean = { _, _ -> true},
+    val allUsers: ConnectionContainer = ConnectionContainer
+) {
+    suspend fun UserConnection.send(message: String) {
+        session.send(message)
+    }
+
+    suspend fun UserConnection.send(message: Frame) {
+        session.send(message)
+    }
+
+    suspend fun UserConnection.send(message: ByteArray) {
+        session.send(message)
+    }
+
+    suspend fun broadcast(message: Frame) {
+        allUsers.userConnections.forEach {
+            it.send(message)
+        }
+    }
+
+    suspend fun broadcast(message: ByteArray) {
+        allUsers.userConnections.forEach {
+            it.send(message)
+        }
+    }
+
+    suspend fun broadcast(message: String) {
+        allUsers.userConnections.forEach {
+            it.send(message)
+        }
+    }
 }

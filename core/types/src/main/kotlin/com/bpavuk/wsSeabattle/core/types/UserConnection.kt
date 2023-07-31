@@ -3,7 +3,7 @@ package com.bpavuk.wsSeabattle.core.types
 import io.ktor.websocket.*
 import java.util.concurrent.atomic.AtomicInteger
 
-class Connection(val session: DefaultWebSocketSession) {
+class UserConnection(val session: DefaultWebSocketSession) {
     companion object {
         val lastId = AtomicInteger(0)
     }

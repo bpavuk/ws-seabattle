@@ -1,15 +1,11 @@
 package com.bpavuk.wsSeabattle.frontend
 
-import com.bpavuk.wsSeabattle.battle.endpoints.create.CreateRoomPlugin
-import com.bpavuk.wsSeabattle.battle.endpoints.create.CreateRoomRepository
 import com.bpavuk.wsSeabattle.battle.endpoints.get.GetRoomRepository
 import com.bpavuk.wsSeabattle.battle.endpoints.get.GetRoomResponse
-import com.bpavuk.wsSeabattle.battle.endpoints.join.JoinRoomPlugin
-import com.bpavuk.wsSeabattle.battle.endpoints.join.JoinRoomRepository
 import com.bpavuk.wsSeabattle.chat.endpoints.ChatRepository
 import com.bpavuk.wsSeabattle.chat.endpoints.ChatResponse
 import com.bpavuk.wsSeabattle.core.endpoints.*
-import com.bpavuk.wsSeabattle.core.types.Connection
+import com.bpavuk.wsSeabattle.core.types.UserConnection
 import com.bpavuk.wsSeabattle.core.types.toCoordinate
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
@@ -20,14 +16,14 @@ fun Route.launchFrontend(deps: FrontendDependencies) {
     val connectionContainer = deps.connectionContainer
     expandableScope(deps.pluginRegistry) {
         webSocket("/battle/session") {
-            val thisConnection = Connection(this)
-            connectionContainer.connections.add(thisConnection)
-            thisConnection.session.send(":q for quit, /new for room creation, /join <room id> for joining, " +
+            val thisUserConnection = UserConnection(this)
+            connectionContainer.userConnections.add(thisUserConnection)
+            thisUserConnection.session.send(":q for quit, /new for room creation, /join <room id> for joining, " +
                     "/whereami for current room")
 
-            install(QuitPlugin(connectionContainer))
-            install(JoinRoomPlugin(deps.joinRoomRepository, connectionContainer))
-            install(CreateRoomPlugin(deps.createRoomRepository, connectionContainer))
+            install(QuitPlugin) // look at this plugin as on example plugin
+            install(deps.joinRoomPlugin)
+            install(deps.createRoomPlugin)
 
             for (frame in incoming) {
                 connectionContainer.removeInactiveConnections()
@@ -36,11 +32,11 @@ fun Route.launchFrontend(deps: FrontendDependencies) {
 
                     when {
                         message == "/whereami" -> {
-                            when (val response = deps.getRoomRepository.getRoomByUserId(thisConnection.userId)) {
+                            when (val response = deps.getRoomRepository.getRoomByUserId(thisUserConnection.userId)) {
                                 GetRoomResponse.NotFound ->
-                                    thisConnection.session.send("you are not joined to any room")
+                                    thisUserConnection.session.send("you are not joined to any room")
                                 is GetRoomResponse.Success ->
-                                    thisConnection.session.send("you are in room ${response.room.id}")
+                                    thisUserConnection.session.send("you are in room ${response.room.id}")
                             }
                         }
                         message.matches("/leave".toRegex()) -> {
@@ -52,14 +48,14 @@ fun Route.launchFrontend(deps: FrontendDependencies) {
                             val coordinate = coordinateFinderRegex.find(message.removePrefix("/shoot"))?.value
                                 ?.toCoordinate()
                             if (coordinate == null) {
-                                thisConnection.session.send("invalid coordinate. to shoot, you should insert" +
+                                thisUserConnection.session.send("invalid coordinate. to shoot, you should insert" +
                                         " valid coordinates")
                             }
                         }
                         else -> {
-                            when (deps.chatRepository.sendTheMessage(thisConnection.userId, message)) {
+                            when (deps.chatRepository.sendTheMessage(thisUserConnection.userId, message)) {
                                 ChatResponse.NotJoinedToAnyRoom ->
-                                    thisConnection.session.send("you are not joined to any room. to chat, " +
+                                    thisUserConnection.session.send("you are not joined to any room. to chat, " +
                                             "join to room using /join <room id> or create new room using /new")
                                 ChatResponse.MessageSent -> {}
                             }
@@ -71,7 +67,7 @@ fun Route.launchFrontend(deps: FrontendDependencies) {
                     do {
                         val plugin = pluginIterator.next()
                         println("plugin ${plugin.javaClass.name} is started")
-                        val isProcessed = plugin.onMessage(frame, thisConnection)
+                        val isProcessed = plugin.onMessage(frame, thisUserConnection)
                     } while (!isProcessed && pluginIterator.hasNext())
                 }
             }
@@ -80,22 +76,20 @@ fun Route.launchFrontend(deps: FrontendDependencies) {
 }
 
 class FrontendDependencies(
-    val createRoomRepository: CreateRoomRepository,
+    val createRoomPlugin: Plugin,
     val getRoomRepository: GetRoomRepository,
-    val joinRoomRepository: JoinRoomRepository,
+    val joinRoomPlugin: Plugin,
     val chatRepository: ChatRepository,
     val connectionContainer: ConnectionContainer,
     val pluginRegistry: PluginRegistry
 )
 
-class QuitPlugin(
-    allUsers: ConnectionContainer
-) : Plugin(allUsers) {
-    override suspend fun onMessage(message: Frame, thisUser: Connection): Boolean {
-        return if ((message is Frame.Text) && (message.readText() == ":q")) {
+val QuitPlugin = createBackendPlugin {
+    onMessage = { message, thisUser ->
+        if ((message is Frame.Text) && (message.readText() == ":q")) {
             thisUser.send("bye")
             thisUser.session.close()
-            allUsers.connections.remove(thisUser)
+            allUsers.userConnections.remove(thisUser)
             true
         } else false
     }

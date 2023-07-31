@@ -13,7 +13,7 @@ class ChatUsecase(
             GetRoomUsecase.Result.NotFound -> return Result.NotJoinedToAnyRoom
             is GetRoomUsecase.Result.Success -> response.room
         }
-        connectionContainer.connections.filter { it.userId in room.opponents }.forEach {
+        connectionContainer.userConnections.filter { it.userId in room.opponents }.forEach {
             it.session.send("[user$userId]: $message")
         }
         return Result.MessageSent

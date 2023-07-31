@@ -3,6 +3,8 @@ package com.bpavuk.wsSeabattle
 import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseCreateRoomStorage
 import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseGetRoomStorage
 import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseJoinRoomStorage
+import com.bpavuk.wsSeabattle.battle.endpoints.create.CreateRoomPlugin
+import com.bpavuk.wsSeabattle.battle.endpoints.join.JoinRoomPlugin
 import com.bpavuk.wsSeabattle.battle.usecase.CreateRoomUsecase
 import com.bpavuk.wsSeabattle.battle.usecase.GetRoomUsecase
 import com.bpavuk.wsSeabattle.battle.usecase.JoinRoomUsecase
@@ -34,23 +36,27 @@ fun Application.module() {
         storage = DatabaseGetRoomStorage()
     )
 
-    val connectionContainer = ConnectionContainer()
-    val pluginRegistry = PluginRegistry()
+    val connectionContainer = ConnectionContainer
+    val pluginRegistry = PluginRegistry
 
     routing {
         launchFrontend(
             FrontendDependencies(
-                createRoomRepository = UsecaseCreateRoomRepository(
-                    usecase = CreateRoomUsecase(
-                        storage = DatabaseCreateRoomStorage()
+                createRoomPlugin = CreateRoomPlugin(
+                    UsecaseCreateRoomRepository(
+                        usecase = CreateRoomUsecase(
+                            storage = DatabaseCreateRoomStorage()
+                        )
                     )
                 ),
                 getRoomRepository = UsecaseGetRoomRepository(
                     usecase = getRoomUsecase
                 ),
-                joinRoomRepository = UsecaseJoinRoomRepository(
-                    usecase = JoinRoomUsecase(
-                        storage = DatabaseJoinRoomStorage()
+                joinRoomPlugin = JoinRoomPlugin(
+                    UsecaseJoinRoomRepository(
+                        usecase = JoinRoomUsecase(
+                            storage = DatabaseJoinRoomStorage()
+                        )
                     )
                 ),
                 chatRepository = UsecaseChatRepository(

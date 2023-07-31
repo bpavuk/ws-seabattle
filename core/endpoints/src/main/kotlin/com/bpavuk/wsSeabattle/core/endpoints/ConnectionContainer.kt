@@ -1,17 +1,17 @@
 package com.bpavuk.wsSeabattle.core.endpoints
 
-import com.bpavuk.wsSeabattle.core.types.Connection
+import com.bpavuk.wsSeabattle.core.types.UserConnection
 import io.ktor.websocket.*
 import kotlinx.coroutines.isActive
 import java.util.*
 
-class ConnectionContainer {
-    val connections: MutableSet<Connection> = Collections.synchronizedSet(LinkedHashSet())
-    val connectionsToRemove: MutableSet<Connection> = Collections.synchronizedSet(LinkedHashSet())
+object ConnectionContainer {
+    val userConnections: MutableSet<UserConnection> = Collections.synchronizedSet(LinkedHashSet())
+    val connectionsToRemove: MutableSet<UserConnection> = Collections.synchronizedSet(LinkedHashSet())
 }
 
 suspend fun ConnectionContainer.removeInactiveConnections() {
-    this.connections.forEach { connection ->
+    this.userConnections.forEach { connection ->
         if (!connection.session.isActive) {
             connection.session.close(
                 CloseReason(
@@ -22,6 +22,6 @@ suspend fun ConnectionContainer.removeInactiveConnections() {
             this.connectionsToRemove.add(connection)
         }
     }
-    this.connections.removeAll(this.connectionsToRemove)
+    this.userConnections.removeAll(this.connectionsToRemove)
     this.connectionsToRemove.clear()
 }
