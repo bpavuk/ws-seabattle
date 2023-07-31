@@ -23,6 +23,7 @@ fun Route.launchFrontend(deps: FrontendDependencies) {
             install(deps.joinRoomPlugin)
             install(deps.createRoomPlugin)
             install(deps.whereAmIPlugin)
+            install(deps.leaveRoomPlugin)
 
             for (frame in incoming) {
                 connectionContainer.removeInactiveConnections()
@@ -67,6 +68,7 @@ class FrontendDependencies(
     val createRoomPlugin: Plugin,
     val joinRoomPlugin: Plugin,
     val whereAmIPlugin: Plugin,
+    val leaveRoomPlugin: Plugin,
     val chatRepository: ChatRepository,
     val connectionContainer: ConnectionContainer,
     val pluginRegistry: PluginRegistry

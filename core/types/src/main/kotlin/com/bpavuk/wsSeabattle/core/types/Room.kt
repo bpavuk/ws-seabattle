@@ -15,4 +15,8 @@ class Room(
     fun addOpponent(userId: Int) {
         opponents.add(userId)
     }
+
+    fun removeOpponent(userId: Int) {
+        opponents.remove(userId)
+    }
 }

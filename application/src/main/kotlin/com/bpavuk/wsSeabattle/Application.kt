@@ -3,15 +3,19 @@ package com.bpavuk.wsSeabattle
 import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseCreateRoomStorage
 import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseGetRoomStorage
 import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseJoinRoomStorage
+import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseLeaveRoomStorage
 import com.bpavuk.wsSeabattle.battle.endpoints.plugins.createRoom.CreateRoomPlugin
 import com.bpavuk.wsSeabattle.battle.endpoints.plugins.joinRoom.JoinRoomPlugin
+import com.bpavuk.wsSeabattle.battle.endpoints.plugins.leaveRoom.LeaveRoomPlugin
 import com.bpavuk.wsSeabattle.battle.endpoints.plugins.whereami.WhereAmIPlugin
 import com.bpavuk.wsSeabattle.battle.usecase.CreateRoomUsecase
 import com.bpavuk.wsSeabattle.battle.usecase.GetRoomUsecase
 import com.bpavuk.wsSeabattle.battle.usecase.JoinRoomUsecase
+import com.bpavuk.wsSeabattle.battle.usecase.LeaveRoomUsecase
 import com.bpavuk.wsSeabattle.battle.usecase.integration.UsecaseCreateRoomRepository
 import com.bpavuk.wsSeabattle.battle.usecase.integration.UsecaseGetRoomRepository
 import com.bpavuk.wsSeabattle.battle.usecase.integration.UsecaseJoinRoomRepository
+import com.bpavuk.wsSeabattle.battle.usecase.integration.UsecaseLeaveRoomRepository
 import com.bpavuk.wsSeabattle.chat.usecase.ChatUsecase
 import com.bpavuk.wsSeabattle.chat.usecase.integration.UsecaseChatRepository
 import com.bpavuk.wsSeabattle.core.endpoints.ConnectionContainer
@@ -54,6 +58,14 @@ fun Application.module() {
                     UsecaseJoinRoomRepository(
                         usecase = JoinRoomUsecase(
                             storage = DatabaseJoinRoomStorage()
+                        )
+                    )
+                ),
+                leaveRoomPlugin = LeaveRoomPlugin(
+                    UsecaseLeaveRoomRepository(
+                        LeaveRoomUsecase(
+                            DatabaseLeaveRoomStorage(),
+                            getRoomUsecase
                         )
                     )
                 ),

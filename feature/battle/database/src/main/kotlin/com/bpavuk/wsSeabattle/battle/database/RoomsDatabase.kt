@@ -57,4 +57,8 @@ class RoomsDao {
     fun joinToRoom(roomId: Int, userId: Int) {
         getRoomById(roomId)!!.addOpponent(userId)
     }
+
+    fun leaveRoom(roomId: Int, userId: Int) {
+        getRoomById(roomId)!!.removeOpponent(userId)
+    }
 }
