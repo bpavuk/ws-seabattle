@@ -6,15 +6,15 @@ import io.ktor.websocket.*
 abstract class Plugin(
     val allUsers: ConnectionContainer
 ) {
-    suspend fun Connection.sendMessage(message: String) {
+    suspend fun Connection.send(message: String) {
         session.send(message)
     }
 
-    suspend fun Connection.sendMessage(message: Frame) {
+    suspend fun Connection.send(message: Frame) {
         session.send(message)
     }
 
-    suspend fun Connection.sendMessage(message: ByteArray) {
+    suspend fun Connection.send(message: ByteArray) {
         session.send(message)
     }
 
@@ -33,4 +33,8 @@ class PluginRegistry {
     fun install(plugin: Plugin) {
         plugins.add(plugin)
     }
+}
+
+fun expandableScope(registry: PluginRegistry, block: PluginRegistry.() -> Unit) {
+    block(registry)
 }
