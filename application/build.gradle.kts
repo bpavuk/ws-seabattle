@@ -18,6 +18,7 @@ repositories {
 
 dependencies {
     implementation(projects.feature)
+    implementation(projects.frontend)
 
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.openapi)

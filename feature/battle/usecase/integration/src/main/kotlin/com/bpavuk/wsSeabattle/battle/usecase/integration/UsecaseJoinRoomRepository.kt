@@ -11,5 +11,6 @@ class UsecaseJoinRoomRepository(val usecase: JoinRoomUsecase) : JoinRoomReposito
     private fun JoinRoomUsecase.Result.toEndpoint(): JoinRoomResult = when (this) {
         JoinRoomUsecase.Result.RoomNotFound -> JoinRoomResult.RoomNotFound
         JoinRoomUsecase.Result.Success -> JoinRoomResult.Success
+        JoinRoomUsecase.Result.AlreadyInRoom -> JoinRoomResult.AlreadyInRoom
     }
 }

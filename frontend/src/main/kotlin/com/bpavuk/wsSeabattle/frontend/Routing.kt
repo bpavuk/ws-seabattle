@@ -1,4 +1,4 @@
-package com.bpavuk.wsSeabattle.battle.endpoints
+package com.bpavuk.wsSeabattle.frontend
 
 import com.bpavuk.wsSeabattle.battle.endpoints.create.CreateRoomRepository
 import com.bpavuk.wsSeabattle.battle.endpoints.create.CreateRoomResponse
@@ -11,11 +11,12 @@ import com.bpavuk.wsSeabattle.chat.endpoints.ChatResponse
 import com.bpavuk.wsSeabattle.core.endpoints.ConnectionContainer
 import com.bpavuk.wsSeabattle.core.endpoints.removeInactiveConnections
 import com.bpavuk.wsSeabattle.core.types.Connection
+import com.bpavuk.wsSeabattle.core.types.toCoordinate
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 
-fun Route.battleRouting(dependencies: BattleDependencies) {
+fun Route.launchFrontend(dependencies: FrontendDependencies) {
     val container = dependencies.connectionContainer
     webSocket("/battle/session") {
         val thisConnection = Connection(this)
@@ -50,7 +51,7 @@ fun Route.battleRouting(dependencies: BattleDependencies) {
                                 thisConnection.session.send("you are in room ${response.room.id}")
                         }
                     }
-                    message.matches("/join \\d+".toRegex()) -> {
+                    message.matches("/join \\d+".toRegex()) || message.matches("/join ?".toRegex()) -> {
                         val numberFinderRegex = Regex("\\d+")
                         val roomId = numberFinderRegex.find(message)!!.value.toInt()
                         when (
@@ -60,13 +61,29 @@ fun Route.battleRouting(dependencies: BattleDependencies) {
                                 thisConnection.session.send("room with id $roomId not found")
                             JoinRoomResult.Success ->
                                 thisConnection.session.send("joined to room $roomId")
+                            JoinRoomResult.AlreadyInRoom ->
+                                thisConnection.session.send("you are already in the room")
+                        }
+                    }
+                    message.matches("/leave".toRegex()) -> {
+
+                    }
+                    message.matches("/shoot ?(([a-fA-F]|[1-9]){2})?".toRegex()) -> {
+                        // TODO: add sea battle logic
+                        val coordinateFinderRegex = Regex("(([a-fA-F]|[1-9]){2})")
+                        val coordinate = coordinateFinderRegex.find(message.removePrefix("/shoot"))?.value
+                            ?.toCoordinate()
+                        if (coordinate == null) {
+                            thisConnection.session.send("invalid coordinate. to shoot, you should insert" +
+                                    " valid coordinates")
                         }
                     }
                     else -> {
                         when (dependencies.chatRepository.sendTheMessage(thisConnection.userId, message)) {
-                            ChatResponse.MessageSent -> {}
                             ChatResponse.NotJoinedToAnyRoom ->
-                                thisConnection.session.send("you are not joined to any room")
+                                thisConnection.session.send("you are not joined to any room. to chat, join to" +
+                                        " room using /join <room id> or create new room using /new")
+                            ChatResponse.MessageSent -> {}
                         }
                     }
                 }
@@ -75,7 +92,7 @@ fun Route.battleRouting(dependencies: BattleDependencies) {
     }
 }
 
-class BattleDependencies(
+class FrontendDependencies(
     val createRoomRepository: CreateRoomRepository,
     val getRoomRepository: GetRoomRepository,
     val joinRoomRepository: JoinRoomRepository,

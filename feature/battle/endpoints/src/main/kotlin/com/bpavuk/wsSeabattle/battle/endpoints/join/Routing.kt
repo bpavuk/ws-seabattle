@@ -8,4 +8,6 @@ sealed interface JoinRoomResult {
     data object Success: JoinRoomResult
 
     data object RoomNotFound: JoinRoomResult
+
+    data object AlreadyInRoom: JoinRoomResult
 }

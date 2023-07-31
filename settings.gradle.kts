@@ -44,3 +44,4 @@ include("feature:chat:usecase")
 findProject(":feature:chat:usecase")?.name = "usecase"
 include("feature:chat:usecase:integration")
 findProject(":feature:chat:usecase:integration")?.name = "integration"
+include("frontend")

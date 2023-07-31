@@ -12,4 +12,7 @@ class DatabaseJoinRoomStorage: JoinRoomUsecase.Storage {
 
     override fun join(roomId: Int, userId: Int) =
         roomsDao.joinToRoom(roomId, userId)
+
+    override fun getRoomByUserId(userId: Int): Room? =
+        roomsDao.getRoomsByUserId(userId).singleOrNull()
 }

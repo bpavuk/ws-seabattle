@@ -3,8 +3,6 @@ package com.bpavuk.wsSeabattle
 import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseCreateRoomStorage
 import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseGetRoomStorage
 import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseJoinRoomStorage
-import com.bpavuk.wsSeabattle.battle.endpoints.BattleDependencies
-import com.bpavuk.wsSeabattle.battle.endpoints.battleRouting
 import com.bpavuk.wsSeabattle.battle.usecase.CreateRoomUsecase
 import com.bpavuk.wsSeabattle.battle.usecase.GetRoomUsecase
 import com.bpavuk.wsSeabattle.battle.usecase.JoinRoomUsecase
@@ -14,6 +12,8 @@ import com.bpavuk.wsSeabattle.battle.usecase.integration.UsecaseJoinRoomReposito
 import com.bpavuk.wsSeabattle.chat.usecase.ChatUsecase
 import com.bpavuk.wsSeabattle.chat.usecase.integration.UsecaseChatRepository
 import com.bpavuk.wsSeabattle.core.endpoints.ConnectionContainer
+import com.bpavuk.wsSeabattle.frontend.FrontendDependencies
+import com.bpavuk.wsSeabattle.frontend.launchFrontend
 import com.bpavuk.wsSeabattle.plugins.configureOpenAPI
 import com.bpavuk.wsSeabattle.plugins.configureSerialization
 import com.bpavuk.wsSeabattle.plugins.configureSockets
@@ -36,8 +36,8 @@ fun Application.module() {
     val connectionContainer = ConnectionContainer()
 
     routing {
-        battleRouting(
-            BattleDependencies(
+        launchFrontend(
+            FrontendDependencies(
                 createRoomRepository = UsecaseCreateRoomRepository(
                     usecase = CreateRoomUsecase(
                         storage = DatabaseCreateRoomStorage()
