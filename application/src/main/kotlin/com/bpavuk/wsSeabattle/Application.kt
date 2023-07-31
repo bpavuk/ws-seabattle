@@ -5,6 +5,7 @@ import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseGetRoomStorage
 import com.bpavuk.wsSeabattle.battle.database.integration.DatabaseJoinRoomStorage
 import com.bpavuk.wsSeabattle.battle.endpoints.create.CreateRoomPlugin
 import com.bpavuk.wsSeabattle.battle.endpoints.join.JoinRoomPlugin
+import com.bpavuk.wsSeabattle.battle.endpoints.whereami.WhereAmIPlugin
 import com.bpavuk.wsSeabattle.battle.usecase.CreateRoomUsecase
 import com.bpavuk.wsSeabattle.battle.usecase.GetRoomUsecase
 import com.bpavuk.wsSeabattle.battle.usecase.JoinRoomUsecase
@@ -49,14 +50,16 @@ fun Application.module() {
                         )
                     )
                 ),
-                getRoomRepository = UsecaseGetRoomRepository(
-                    usecase = getRoomUsecase
-                ),
                 joinRoomPlugin = JoinRoomPlugin(
                     UsecaseJoinRoomRepository(
                         usecase = JoinRoomUsecase(
                             storage = DatabaseJoinRoomStorage()
                         )
+                    )
+                ),
+                whereAmIPlugin = WhereAmIPlugin(
+                    UsecaseGetRoomRepository(
+                        usecase = getRoomUsecase
                     )
                 ),
                 chatRepository = UsecaseChatRepository(

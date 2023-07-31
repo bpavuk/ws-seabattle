@@ -1,7 +1,5 @@
 package com.bpavuk.wsSeabattle.frontend
 
-import com.bpavuk.wsSeabattle.battle.endpoints.get.GetRoomRepository
-import com.bpavuk.wsSeabattle.battle.endpoints.get.GetRoomResponse
 import com.bpavuk.wsSeabattle.chat.endpoints.ChatRepository
 import com.bpavuk.wsSeabattle.chat.endpoints.ChatResponse
 import com.bpavuk.wsSeabattle.core.endpoints.*
@@ -24,6 +22,7 @@ fun Route.launchFrontend(deps: FrontendDependencies) {
             install(QuitPlugin) // look at this plugin as on example plugin
             install(deps.joinRoomPlugin)
             install(deps.createRoomPlugin)
+            install(deps.whereAmIPlugin)
 
             for (frame in incoming) {
                 connectionContainer.removeInactiveConnections()
@@ -31,14 +30,6 @@ fun Route.launchFrontend(deps: FrontendDependencies) {
                     val message = frame.readText()
 
                     when {
-                        message == "/whereami" -> {
-                            when (val response = deps.getRoomRepository.getRoomByUserId(thisUserConnection.userId)) {
-                                GetRoomResponse.NotFound ->
-                                    thisUserConnection.session.send("you are not joined to any room")
-                                is GetRoomResponse.Success ->
-                                    thisUserConnection.session.send("you are in room ${response.room.id}")
-                            }
-                        }
                         message.matches("/leave".toRegex()) -> {
                             // TODO: add room leaving logic
                         }
@@ -77,8 +68,8 @@ fun Route.launchFrontend(deps: FrontendDependencies) {
 
 class FrontendDependencies(
     val createRoomPlugin: Plugin,
-    val getRoomRepository: GetRoomRepository,
     val joinRoomPlugin: Plugin,
+    val whereAmIPlugin: Plugin,
     val chatRepository: ChatRepository,
     val connectionContainer: ConnectionContainer,
     val pluginRegistry: PluginRegistry
