@@ -1,4 +1,4 @@
-package com.bpavuk.wsSeabattle.battle.endpoints.whereami
+package com.bpavuk.wsSeabattle.battle.endpoints.plugins.whereami
 
 import com.bpavuk.wsSeabattle.battle.endpoints.get.GetRoomRepository
 import com.bpavuk.wsSeabattle.battle.endpoints.get.GetRoomResponse
