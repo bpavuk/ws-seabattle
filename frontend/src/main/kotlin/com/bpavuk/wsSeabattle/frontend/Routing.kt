@@ -4,8 +4,8 @@ import com.bpavuk.wsSeabattle.battle.endpoints.create.CreateRoomRepository
 import com.bpavuk.wsSeabattle.battle.endpoints.create.CreateRoomResponse
 import com.bpavuk.wsSeabattle.battle.endpoints.get.GetRoomRepository
 import com.bpavuk.wsSeabattle.battle.endpoints.get.GetRoomResponse
+import com.bpavuk.wsSeabattle.battle.endpoints.join.JoinRoomPlugin
 import com.bpavuk.wsSeabattle.battle.endpoints.join.JoinRoomRepository
-import com.bpavuk.wsSeabattle.battle.endpoints.join.JoinRoomResult
 import com.bpavuk.wsSeabattle.chat.endpoints.ChatRepository
 import com.bpavuk.wsSeabattle.chat.endpoints.ChatResponse
 import com.bpavuk.wsSeabattle.core.endpoints.ConnectionContainer
@@ -17,6 +17,7 @@ import com.bpavuk.wsSeabattle.core.types.toCoordinate
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import kotlinx.coroutines.launch
 
 fun Route.launchFrontend(dependencies: FrontendDependencies) {
     val connectionContainer = dependencies.connectionContainer
@@ -27,6 +28,7 @@ fun Route.launchFrontend(dependencies: FrontendDependencies) {
                 "/whereami for current room")
 
         dependencies.pluginRegistry.install(QuitPlugin(connectionContainer))
+        dependencies.pluginRegistry.install(JoinRoomPlugin(dependencies.joinRoomRepository, connectionContainer))
 
         for (frame in incoming) {
             connectionContainer.removeInactiveConnections()
@@ -49,20 +51,6 @@ fun Route.launchFrontend(dependencies: FrontendDependencies) {
                                 thisConnection.session.send("you are not joined to any room")
                             is GetRoomResponse.Success ->
                                 thisConnection.session.send("you are in room ${response.room.id}")
-                        }
-                    }
-                    message.matches("/join \\d+".toRegex()) || message.matches("/join ?".toRegex()) -> {
-                        val numberFinderRegex = Regex("\\d+")
-                        val roomId = numberFinderRegex.find(message)!!.value.toInt()
-                        when (
-                            dependencies.joinRoomRepository.join(roomId, thisConnection.userId)
-                        ) {
-                            JoinRoomResult.RoomNotFound ->
-                                thisConnection.session.send("room with id $roomId not found")
-                            JoinRoomResult.Success ->
-                                thisConnection.session.send("joined to room $roomId")
-                            JoinRoomResult.AlreadyInRoom ->
-                                thisConnection.session.send("you are already in the room")
                         }
                     }
                     message.matches("/leave".toRegex()) -> {
@@ -88,8 +76,13 @@ fun Route.launchFrontend(dependencies: FrontendDependencies) {
                     }
                 }
             }
-            dependencies.pluginRegistry.plugins.forEach { plugin ->
-                plugin.onMessage(frame, thisConnection)
+            launch {
+                val pluginIterator = dependencies.pluginRegistry.plugins.iterator()
+                do {
+                    val plugin = pluginIterator.next()
+                    println("plugin ${plugin.javaClass.name} is started")
+                    val isProcessed = plugin.onMessage(frame, thisConnection)
+                } while (!isProcessed && pluginIterator.hasNext())
             }
         }
     }
