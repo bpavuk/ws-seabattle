@@ -8,7 +8,7 @@ import io.ktor.websocket.*
 @Suppress("FunctionName")
 fun CreateRoomPlugin(createRoomRepository: CreateRoomRepository) = createBackendPlugin {
     // fixme: add ability to get the repository
-    onMessage = { message, thisUser ->
+    onMessage { message, thisUser ->
         if (message is Frame.Text && message.readText() == "/new") {
             when (val response = createRoomRepository.createRoom(thisUser.userId)) {
                 is CreateRoomResponse.Success ->

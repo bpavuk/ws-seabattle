@@ -10,7 +10,7 @@ import io.ktor.websocket.*
 fun JoinRoomPlugin(
     joinRoomRepository: JoinRoomRepository
 ): Plugin = createBackendPlugin {
-    onMessage = { message, thisUser ->
+    onMessage { message, thisUser ->
         if (message is Frame.Text && message.readText().matches("/join ?\\d+?".toRegex())) {
             val numberFinderRegex = Regex("\\d+")
             val roomId = numberFinderRegex.find(message.readText())!!.value.toInt()

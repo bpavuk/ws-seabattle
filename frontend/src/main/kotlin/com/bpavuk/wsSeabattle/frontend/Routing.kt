@@ -30,9 +30,6 @@ fun Route.launchFrontend(deps: FrontendDependencies) {
                     val message = frame.readText()
 
                     when {
-                        message.matches("/leave".toRegex()) -> {
-                            // TODO: add room leaving logic
-                        }
                         message.matches("/shoot ?(([a-fA-F]|[1-9]){2})?".toRegex()) -> {
                             // TODO: add sea battle logic
                             val coordinateFinderRegex = Regex("(([a-fA-F]|[1-9]){2})")
@@ -76,7 +73,7 @@ class FrontendDependencies(
 )
 
 val QuitPlugin = createBackendPlugin {
-    onMessage = { message, thisUser ->
+    onMessage { message, thisUser ->
         if ((message is Frame.Text) && (message.readText() == ":q")) {
             thisUser.send("bye")
             thisUser.session.close()

@@ -31,7 +31,7 @@ fun createBackendPlugin(
 
 @Suppress("MemberVisibilityCanBePrivate", "unused")
 class PluginApi(
-    var onMessage: suspend (Frame, UserConnection) -> Boolean = { _, _ -> true},
+    internal var onMessage: suspend (Frame, UserConnection) -> Boolean = { _, _ -> true},
     val allUsers: ConnectionContainer = ConnectionContainer
 ) {
     suspend fun UserConnection.send(message: String) {
@@ -62,5 +62,9 @@ class PluginApi(
         allUsers.userConnections.forEach {
             it.send(message)
         }
+    }
+
+    fun onMessage(handler: suspend (Frame, UserConnection) -> Boolean) {
+        onMessage = handler
     }
 }

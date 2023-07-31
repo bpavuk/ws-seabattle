@@ -8,7 +8,7 @@ import io.ktor.websocket.*
 
 @Suppress("FunctionName")
 fun WhereAmIPlugin(getRoomRepository: GetRoomRepository): Plugin = createBackendPlugin {
-    onMessage = { message, thisUser ->
+    onMessage { message, thisUser ->
         if (message is Frame.Text && message.readText() == "/whereami") {
             when (val response = getRoomRepository.getRoomByUserId(thisUser.userId)) {
                 GetRoomResponse.NotFound ->
