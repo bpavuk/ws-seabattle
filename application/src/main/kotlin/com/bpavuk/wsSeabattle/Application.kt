@@ -12,6 +12,7 @@ import com.bpavuk.wsSeabattle.battle.usecase.integration.UsecaseJoinRoomReposito
 import com.bpavuk.wsSeabattle.chat.usecase.ChatUsecase
 import com.bpavuk.wsSeabattle.chat.usecase.integration.UsecaseChatRepository
 import com.bpavuk.wsSeabattle.core.endpoints.ConnectionContainer
+import com.bpavuk.wsSeabattle.core.endpoints.PluginRegistry
 import com.bpavuk.wsSeabattle.frontend.FrontendDependencies
 import com.bpavuk.wsSeabattle.frontend.launchFrontend
 import com.bpavuk.wsSeabattle.plugins.configureOpenAPI
@@ -34,6 +35,7 @@ fun Application.module() {
     )
 
     val connectionContainer = ConnectionContainer()
+    val pluginRegistry = PluginRegistry()
 
     routing {
         launchFrontend(
@@ -57,7 +59,8 @@ fun Application.module() {
                         connectionContainer = connectionContainer
                     )
                 ),
-                connectionContainer = connectionContainer
+                connectionContainer = connectionContainer,
+                pluginRegistry = pluginRegistry
             ),
         )
     }

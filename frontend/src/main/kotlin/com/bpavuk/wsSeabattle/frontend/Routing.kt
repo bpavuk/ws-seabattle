@@ -9,6 +9,8 @@ import com.bpavuk.wsSeabattle.battle.endpoints.join.JoinRoomResult
 import com.bpavuk.wsSeabattle.chat.endpoints.ChatRepository
 import com.bpavuk.wsSeabattle.chat.endpoints.ChatResponse
 import com.bpavuk.wsSeabattle.core.endpoints.ConnectionContainer
+import com.bpavuk.wsSeabattle.core.endpoints.Plugin
+import com.bpavuk.wsSeabattle.core.endpoints.PluginRegistry
 import com.bpavuk.wsSeabattle.core.endpoints.removeInactiveConnections
 import com.bpavuk.wsSeabattle.core.types.Connection
 import com.bpavuk.wsSeabattle.core.types.toCoordinate
@@ -17,24 +19,22 @@ import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 
 fun Route.launchFrontend(dependencies: FrontendDependencies) {
-    val container = dependencies.connectionContainer
+    val connectionContainer = dependencies.connectionContainer
     webSocket("/battle/session") {
         val thisConnection = Connection(this)
-        container.connections.add(thisConnection)
+        connectionContainer.connections.add(thisConnection)
         thisConnection.session.send(":q for quit, /new for room creation, /join <room id> for joining, " +
                 "/whereami for current room")
+
+        dependencies.pluginRegistry.install(QuitPlugin(connectionContainer))
+
         for (frame in incoming) {
+            connectionContainer.removeInactiveConnections()
             if (frame is Frame.Text) {
-                container.removeInactiveConnections()
 
                 val message = frame.readText()
 
                 when {
-                    message == ":q" -> {
-                        thisConnection.session.send("bye")
-                        thisConnection.session.close()
-                        container.connections.remove(thisConnection)
-                    }
                     message == "/new" -> {
                         when (val response = dependencies.createRoomRepository.createRoom(thisConnection.userId)) {
                             is CreateRoomResponse.Success ->
@@ -66,7 +66,7 @@ fun Route.launchFrontend(dependencies: FrontendDependencies) {
                         }
                     }
                     message.matches("/leave".toRegex()) -> {
-
+                        // TODO: add room leaving logic
                     }
                     message.matches("/shoot ?(([a-fA-F]|[1-9]){2})?".toRegex()) -> {
                         // TODO: add sea battle logic
@@ -88,6 +88,9 @@ fun Route.launchFrontend(dependencies: FrontendDependencies) {
                     }
                 }
             }
+            dependencies.pluginRegistry.plugins.forEach { plugin ->
+                plugin.onMessage(frame, thisConnection)
+            }
         }
     }
 }
@@ -97,5 +100,19 @@ class FrontendDependencies(
     val getRoomRepository: GetRoomRepository,
     val joinRoomRepository: JoinRoomRepository,
     val chatRepository: ChatRepository,
-    val connectionContainer: ConnectionContainer
+    val connectionContainer: ConnectionContainer,
+    val pluginRegistry: PluginRegistry
 )
+
+class QuitPlugin(
+    allUsers: ConnectionContainer
+) : Plugin(allUsers) {
+    override suspend fun onMessage(message: Frame, thisUser: Connection): Boolean {
+        return if ((message is Frame.Text) && (message.readText() == ":q")) {
+            thisUser.sendMessage("bye")
+            thisUser.session.close()
+            allUsers.connections.remove(thisUser)
+            true
+        } else false
+    }
+}
